@@ -24,19 +24,79 @@
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>Hello World</title>
+        <script type="text/javascript">
+            var to_store = "Plunketts Creek Bridge No. 3 was a rubble masonry stone arch bridge over Plunketts Creek in Plunketts Creek Township, Lycoming County, in the U.S. state of Pennsylvania. It was built between 1840 and 1875, probably closer to 1840, when the road along the creek between the villages of Barbours and Proctor was constructed. It was named as the third bridge to cross the creek, and was 75 feet (23 m) long. ";
+
+        </script>
     </head>
     <body>
         <div class="app">
             <h1>Apache Cordova</h1>
             <div id="deviceready" class="blink">
                 <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
+                <p class="event received" id="bob">Device is Ready</p>
             </div>
         </div>
+        <script type="text/javascript" src="js/lz.js"></script>
+        <script type="text/javascript" src="js/lzma_worker.js"></script>
+        <script type="text/javascript" src="js/deflate/rawdeflate.js"></script>
+        <script type="text/javascript" src="js/deflate/rawinflate.js"></script>
+        <script type="text/javascript" src="js/deflate/test/base64.js"></script>
         <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/phonegap-nfc.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript">
             app.initialize();
+            function parseTag(nfcEvent) {
+                var records = nfcEvent.tag.ndefMessage;
+                var tagContent = "";
+
+                for (var i = 0; i < records.length; i++) {
+                    var record = records[i];
+                    tagContent += nfc.bytesToString(record.payload);
+                }
+
+                return tagContent.substring(3);
+            }
+
+            function ready() {
+
+                function onNfc(nfcEvent) {
+                    console.log('nfc content');
+                    var message = parseTag(nfcEvent);
+                    message = LZString.decompress(message);
+                    console.log(message == to_store);
+                    console.log(message);
+                    document.getElementById('bob').innerHTML = message;
+                    document.getElementById('bob').className += ' bob';
+
+                    var ndefRecord = ndef.textRecord(LZString.compress(to_store)),
+                        ndefMessage = [];
+
+                    ndefMessage.push(ndefRecord);
+
+                    nfc.write(
+                        ndefMessage,
+                        function(){alert('info saved')},
+                        function(e){console.error(e);alert('error saving')});
+                }
+
+                function win() {
+                    // alert("Listening for NFC Tags");
+                }
+
+                function fail(error) {
+                    alert("Error adding NFC listener");
+                }
+
+
+                nfc.addNdefListener(onNfc, win, fail);
+            }
+
+            function init() {
+                document.addEventListener('deviceready', ready, false);
+            }
+            init();
         </script>
     </body>
 </html>
