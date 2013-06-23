@@ -25,7 +25,18 @@
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>Hello World</title>
         <script type="text/javascript">
-            var to_store = "Plunketts Creek Bridge No. 3 was a rubble masonry stone arch bridge over Plunketts Creek in Plunketts Creek Township, Lycoming County, in the U.S. state of Pennsylvania. It was built between 1840 and 1875, probably closer to 1840, when the road along the creek between the villages of Barbours and Proctor was constructed. It was named as the third bridge to cross the creek, and was 75 feet (23 m) long. ";
+            var to_store = {
+                "kid": {
+                    "name": "Zamaria Kanaï你好",
+                    "bday": "1988-06-13",
+                    "sex": "M"
+                },
+                "vaccinations": [
+                    {"type": "rubeole", "shot": "MLKJZE080MG", "date": "1988-12-12", "notes": "Allergic to rubeom-70. Therefore made a shot of mld 89"}
+                ]
+            };
+
+            to_store = JSON.stringify(to_store);
 
         </script>
     </head>
@@ -38,6 +49,9 @@
             </div>
         </div>
         <script type="text/javascript" src="js/lz.js"></script>
+        <script type="text/javascript" src="js/lzjb/freeze.js"></script>
+        <script type="text/javascript" src="js/lzjb/Iuppiter.js"></script>
+        <script type="text/javascript" src="js/lzjb/makeBuffer.js"></script>
         <script type="text/javascript" src="js/lzma_worker.js"></script>
         <script type="text/javascript" src="js/deflate/rawdeflate.js"></script>
         <script type="text/javascript" src="js/deflate/rawinflate.js"></script>
@@ -64,13 +78,12 @@
                 function onNfc(nfcEvent) {
                     console.log('nfc content');
                     var message = parseTag(nfcEvent);
-                    message = LZString.decompress(message);
-                    console.log(message == to_store);
-                    console.log(message);
+                    // message = RawDeflate.inflate(message);
                     document.getElementById('bob').innerHTML = message;
                     document.getElementById('bob').className += ' bob';
 
-                    var ndefRecord = ndef.textRecord(LZString.compress(to_store)),
+                    // RawDeflate.deflate(to_store)
+                    var ndefRecord = ndef.textRecord(to_store),
                         ndefMessage = [];
 
                     ndefMessage.push(ndefRecord);
